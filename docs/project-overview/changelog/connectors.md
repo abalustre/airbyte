@@ -10,6 +10,113 @@ Note: Airbyte is not built on top of Singer, but is compatible with Singer's pro
 
 Check out our [connector roadmap](https://github.com/airbytehq/airbyte/projects/3) to see what we're currently working on.
 
+## 9/9/2021
+
+New source:
+* [**Facebook Pages**](https://docs.airbyte.io/integrations/sources/facebook-pages)
+
+New destinations:
+* [**MongoDB**](https://docs.airbyte.io/integrations/destinations/mongodb)
+* [**DynamoDB**](https://docs.airbyte.io/integrations/destinations/dynamodb)
+
+New features:
+* **S3** source: Support for Parquet format.
+* **Github** source: Branches, repositories, organization users, tags, and pull request stats streams added (contributed by @Christopher Wu).
+* **BigQuery** destination: Added GCS upload option.
+* **Salesforce** source: Now Airbyte native.
+* **Redshift** destination: Optimized for performance.
+
+Bug fixes:
+* **Pipedrive** source: Output schemas no longer remove timestamp from fields.
+* **Github** source: Empty repos and negative backoff values are now handled correctly.
+* **Harvest** source: Normalization now works as expected.
+* **All CDC sources**: Removed sleep logic which caused exceptions when loading data from high-volume sources.
+* **Slack** source: Increased number of retries to tolerate flaky retry wait times on the API side.
+* **Slack** source: Sync operations no longer hang indefinitely.
+* **Jira** source: Now uses updated time as the cursor field for incremental sync instead of the created time.
+* **Intercom** source: Fixed inconsistency between schema and output data.
+* **Hubspot** source: Streams with the items property now have their schemas fixed.
+* **Hubspot** source: Empty strings are no longer handled as dates, fixing the deals, companies, and contacts streams.
+* **Typeform** source: Allows for multiple choices in responses now.
+* **Shopify** source: The type for the amount field is now fixed in the schema.
+* **Postgres** destination: \u0000(NULL) value processing is now fixed.
+
+## 9/1/2021
+
+New sources:
+* [**Bamboo HR**](https://docs.airbyte.io/integrations/sources/bamboo-hr)
+* [**BigCommerce**](https://docs.airbyte.io/integrations/sources/bigcommerce)
+* [**Trello**](https://docs.airbyte.io/integrations/sources/trello)
+* [**Google Analytics V4**](https://docs.airbyte.io/integrations/sources/google-analytics-v4)
+* [**Amazon Ads**](https://docs.airbyte.io/integrations/sources/google-analytics-v4)
+
+Bug fixes:
+* **Shopify** source: Rate limit throttling fixed.
+
+## 8/26/2021
+
+New source: 
+* [**Short.io**](https://docs.airbyte.io/integrations/sources/shortio)
+
+New features:
+* **GitHub** source: Add support for rotating through multiple API tokens.
+* **Google Ads** source: Added `UserLocationReport` stream.
+* **Cart** source: Added the `order_items` stream.
+
+Bug fixes:
+* **Postgres** source: Fix out-of-memory issue with CDC interacting with large JSON blobs.
+* **Intercom** source: Pagination now works as expected.
+
+## 8/18/2021
+
+New source:
+* [**Bing Ads**](https://docs.airbyte.io/integrations/sources/bing-ads)
+
+New destination:
+* [**Keen**](https://docs.airbyte.io/integrations/destinations/keen)
+
+New features:
+* **Chargebee** source: Adds support for the `items`, `item prices` and  `attached items` endpoints.
+
+Bug fixes:
+* **Quickbooks** source: Now uses the number data type for decimal fields.
+* **Hubspot** source: Fixed `empty string` inside of the `number` and `float` datatypes.
+* **GitHub** source: Validation fixed on non-required fields.
+* **BigQuery** destination: Now supports processing of arrays of records properly.
+* **Oracle** destination: Fixed destination check for users without DBA role.
+
+## 8/9/2021
+
+New sources:
+* [**S3/Abstract Files**](https://docs.airbyte.io/integrations/sources/s3)
+* [**Zuora**](https://docs.airbyte.io/integrations/sources/zuora)
+* [**Kustomer**](https://docs.airbyte.io/integrations/sources/kustomer)
+* [**Apify**](https://docs.airbyte.io/integrations/sources/apify-dataset)
+* [**Chargebee**](https://docs.airbyte.io/integrations/sources/chargebee)
+
+
+New features:
+* **Shopify** source: The `status` property is now in the `Products` stream.
+* **Amazon Seller Partner** source: Added support for `GET_MERCHANT_LISTINGS_ALL_DATA` and `GET_FBA_INVENTORY_AGED_DATA` stream endpoints.
+* **GitHub** source: Existing streams now don't minify the `user` property.
+* **Hubspot** source: Updated user-defined custom field schema generation.
+* **Zendesk** source: Migrated from Singer to the Airbyte CDK.
+* **Amazon Seller Partner** source: Migrated to the Airbyte CDK.
+
+
+Bug fixes:
+* **Hubspot** source: Casting exceptions are now logged correctly.
+* **S3** source: Fixed bug where syncs could hang indefinitely.
+* **Shopify** source: Fixed the `products` schema to be in accordance with the API.
+* **PayPal Transactions** source: Fixed the start date minimum to be 3 years rather than 45 days.
+* **Google Ads** source: Added the `login-customer-id` setting.
+* **Intercom** source: Rate limit corrected from 1000 requests/minute from 1000 requests/hour.
+* **S3** source: Fixed bug in spec to properly display the `format` field in the UI.
+
+New CDK features:
+* Now allows for setting request data in non-JSON formats.
+
+
 ## 7/30/2021
 
 New sources:
@@ -300,7 +407,7 @@ Other progress on connectors:
 
 ## 03/08/2021
 
-* 1 new source connector: [**MongoDB**](https://docs.airbyte.io/integrations/sources/mongodb)
+* 1 new source connector: **MongoDB**
 * **Google Analytics**: Support chunked syncs to avoid sampling
 * **AppStore**: fix bug where the catalog was displayed incorrectly
 

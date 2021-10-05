@@ -4,10 +4,10 @@ import { useLocalStorage } from "react-use";
 import { useResetter } from "rest-hooks";
 
 import { CloudWorkspacesService } from "packages/cloud/lib/domain/cloudWorkspaces/CloudWorkspacesService";
-import { api } from "packages/cloud/config/api";
 import { useCurrentUser } from "packages/cloud/services/auth/AuthService";
 import { useDefaultRequestMiddlewares } from "packages/cloud/services/useDefaultRequestMiddlewares";
 import { CloudWorkspace } from "packages/cloud/lib/domain/cloudWorkspaces/types";
+import { useConfig } from "packages/cloud/services/config";
 
 type Context = {
   currentWorkspaceId?: string | null;
@@ -25,10 +25,11 @@ export const WorkspaceServiceContext = React.createContext<Context | null>(
 
 function useGetWorkspaceService() {
   const requestAuthMiddleware = useDefaultRequestMiddlewares();
+  const { cloudApiUrl } = useConfig();
 
   return useMemo(
-    () => new CloudWorkspacesService(requestAuthMiddleware, api.cloud),
-    [requestAuthMiddleware]
+    () => new CloudWorkspacesService(cloudApiUrl, requestAuthMiddleware),
+    [requestAuthMiddleware, cloudApiUrl]
   );
 }
 
@@ -48,6 +49,23 @@ export function useCreateWorkspace() {
   return useMutation(
     async (payload: { name: string; userId: string }) =>
       service.create(payload),
+    {
+      onSuccess: (result) => {
+        queryClient.setQueryData<CloudWorkspace[]>("workspaces", (old) => [
+          ...(old ?? []),
+          result,
+        ]);
+      },
+    }
+  ).mutateAsync;
+}
+
+export function useUpdateWorkspace() {
+  const service = useGetWorkspaceService();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    async (workspaceId: string) => service.update(workspaceId, { name: "" }),
     {
       onSuccess: (result) => {
         queryClient.setQueryData<CloudWorkspace[]>("workspaces", (old) => [
@@ -80,9 +98,25 @@ export function useRemoveWorkspace() {
 export function useGetWorkspace(workspaceId: string) {
   const service = useGetWorkspaceService();
 
-  return useQuery(["workspace", workspaceId], () => service.get(workspaceId), {
-    suspense: true,
-  });
+  return useQuery(
+    ["cloud_workspace", workspaceId],
+    () => service.get(workspaceId),
+    {
+      suspense: true,
+    }
+  ) as any;
+}
+
+export function useGetUsage(workspaceId: string) {
+  const service = useGetWorkspaceService();
+
+  return useQuery(
+    ["cloud_workspace", workspaceId, "usage"],
+    () => service.getUsage(workspaceId),
+    {
+      suspense: true,
+    }
+  );
 }
 
 export const WorkspaceServiceProvider: React.FC = ({ children }) => {

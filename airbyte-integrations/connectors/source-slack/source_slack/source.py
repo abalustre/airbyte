@@ -1,25 +1,5 @@
 #
-# MIT License
-#
-# Copyright (c) 2020 Airbyte
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# Copyright (c) 2021 Airbyte, Inc., all rights reserved.
 #
 
 import copy
@@ -42,6 +22,11 @@ class SlackStream(HttpStream, ABC):
     url_base = "https://slack.com/api/"
     primary_key = "id"
     page_size = 100
+
+    @property
+    def max_retries(self) -> int:
+        # Slack's rate limiting can be unpredictable so we increase the max number of retries by a lot before failing
+        return 20
 
     def next_page_token(self, response: requests.Response) -> Optional[Mapping[str, Any]]:
         """Slack uses a cursor-based pagination strategy.
@@ -79,10 +64,13 @@ class SlackStream(HttpStream, ABC):
         Slack puts the retry time in the `Retry-After` response header so we
         we return that value. If the response is anything other than a 429 (e.g: 5XX)
         fall back on default retry behavior.
-
         Rate Limits Docs: https://api.slack.com/docs/rate-limits#web"""
 
-        return int(response.headers.get("Retry-After", 0))
+        if "Retry-After" in response.headers:
+            return int(response.headers["Retry-After"])
+        else:
+            self.logger.info("Retry-after header not found. Using default backoff value")
+            return 5
 
     @property
     @abstractmethod

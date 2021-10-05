@@ -70,7 +70,8 @@ def createSpotlessTarget = { pattern ->
         'dbt_schema_tests',
         'normalization_test_output',
         'tools',
-        'secrets'
+        'secrets',
+        'charts' // Helm charts often have injected template strings that will fail general linting. Helm linting is done separately.
     ]
 
     if (System.getenv().containsKey("SUB_BUILD")) {
@@ -88,7 +89,7 @@ spotless {
 
         eclipse('4.16.0').configFile(rootProject.file('tools/gradle/codestyle/java-google-style.xml'))
 
-        licenseHeaderFile createJavaLicenseWith(rootProject.file('LICENSE'))
+        licenseHeaderFile createJavaLicenseWith(rootProject.file('LICENSE_SHORT'))
         removeUnusedImports()
         trimTrailingWhitespace()
     }
@@ -114,9 +115,10 @@ allprojects {
     afterEvaluate { project ->
         def composeDeps = [
                 ":airbyte-config:init",
-                ":airbyte-db",
+                ":airbyte-db:lib",
                 ":airbyte-migration",
                 ":airbyte-scheduler:app",
+                ":airbyte-workers",
                 ":airbyte-server",
                 ":airbyte-webapp",
         ].toSet().asImmutable()
@@ -247,7 +249,6 @@ if (!System.getenv().containsKey("SUB_BUILD") || System.getenv().get("SUB_BUILD"
 }
 
 task('generate') {
-    dependsOn subprojects.collect { it.getTasksByName('generateSeed', true) }
     dependsOn subprojects.collect { it.getTasksByName('generateProtocolClassFiles', true) }
     dependsOn subprojects.collect { it.getTasksByName('generateJsonSchema2Pojo', true) }
 }
@@ -265,7 +266,7 @@ subprojects {
     if(pythonFormatTask != null) {
         apply plugin: "com.github.hierynomus.license"
         task licenseFormatPython(type: com.hierynomus.gradle.license.tasks.LicenseFormat) {
-            header = createPythonLicenseWith(rootProject.file('LICENSE'))
+            header = createPythonLicenseWith(rootProject.file('LICENSE_SHORT'))
             source = fileTree(dir: projectDir)
                     .include("**/*.py")
                     .exclude(".venv/**/*.py")
@@ -301,7 +302,7 @@ tasks.withType(AbstractArchiveTask) {
 //        ':airbyte-config:init',
 //        ':airbyte-config:models',
 //        ':airbyte-config:persistence',
-//        ':airbyte-db',
+//        ':airbyte-db:lib',
 //        ':airbyte-json-validation',
 //        ':airbyte-migration',
 //        ':airbyte-notification',
