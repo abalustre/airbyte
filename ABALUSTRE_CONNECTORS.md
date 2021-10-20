@@ -31,15 +31,12 @@ docker build . -t airbyte/source-http-request:0.1.0
 ```
 
 **New connector form**
-
-****
-**Connector display name**: HTTP Request
-
-**Docker repository name**: airbyte/source-http-request
-
-**Docker image tag**: 0.1.0
-
-**Connector Documentation URL**: None
+|                             |                             |  
+| --------------------------- | --------------------------- |
+| Connector display name      | HTTP Request                |
+| Docker repository name      | airbyte/source-http-request |
+| Docker image tag            | 0.1.0                       |
+| Connector Documentation URL | None                        |
 
 #### How to use it?
 
