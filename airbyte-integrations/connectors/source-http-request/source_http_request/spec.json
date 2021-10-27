@@ -49,6 +49,11 @@
       "json_field": {
         "description": "the field where the data has to be collected when response format is json and source is field",
         "type": "string"
+      },
+      "json_type": {
+        "description": "the fields value type",
+        "type": "string",
+        "enum": ["array", "object"]
       }
     }
   }
