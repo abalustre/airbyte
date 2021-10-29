@@ -1,0 +1,7 @@
+{
+    "url": "https://swapi-graphql.netlify.app/.netlify/functions/index",
+    "http_method": "POST",
+    "params": "[{\"variables\": {}}]",
+    "json_source": "field",
+    "json_field": "root.allFilms.films"
+}

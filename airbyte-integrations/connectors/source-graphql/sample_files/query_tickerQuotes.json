@@ -1,0 +1,9 @@
+{
+    "url": "https://md.uat.idealtech.services/",
+    "http_method": "POST",
+    "api_key": "tPS4XotJcf4DcW74vU6Z6ajtqcLwJs0z9A8gia52",
+    "api_key_name": "x-api-key",
+    "params": "[{\"input_query\": \"query ($ticker: String!, $startDate: DateTime!, $endDate: DateTime) { tickerQuotes( ticker: $ticker startDate: $startDate endDate: $endDate) { totalCount nodes { tradeDate open close high low averagePrice numberOfTrades totalQuantity financialVolume bestBid bestAsk adjOpen adjClose adjHigh adjLow adjAveragePrice } } }\", \"variables\": {\"ticker\": \"PETR4\", \"startDate\": \"2021-03-23\", \"endDate\": \"2021-03-25\"}}]",
+    "json_source": "field",
+    "json_field": "root.tickerQuotes.nodes"
+}

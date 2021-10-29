@@ -1,0 +1,8 @@
+*
+!Dockerfile
+!Dockerfile.test
+!main.py
+!entrypoint.sh
+!source_graphql
+!setup.py
+!secrets

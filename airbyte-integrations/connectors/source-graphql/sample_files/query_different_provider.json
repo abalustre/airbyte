@@ -1,0 +1,7 @@
+{
+    "url": "https://swapi-graphql.netlify.app/.netlify/functions/index",
+    "http_method": "POST",
+    "params": "[{\"input_query\": \"query Root($after: String, $first: Int) { allFilms(after: $after, first: $first) { pageInfo { hasNextPage hasPreviousPage startCursor endCursor } totalCount films { title episodeID openingCrawl director producers releaseDate } } }\", \"variables\": {}}]",
+    "json_source": "field",
+    "json_field": "root.allFilms.films"
+}
