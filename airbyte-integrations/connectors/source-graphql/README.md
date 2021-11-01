@@ -55,7 +55,11 @@ python main.py read --config sample_files/config.json --catalog sample_files/con
 #### Build
 First, make sure you build the latest Docker image:
 ```
+For Dev run:
 docker build . -t airbyte/source-graphql:dev
+
+For Prod run:
+docker build . -t airbyte/source-graphql:0.1.0
 ```
 
 You can also build the connector image via Gradle:

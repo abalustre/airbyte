@@ -44,7 +44,7 @@ from io import StringIO
 from dateutil.parser import parse
 
 
-class HttpRequest(HttpStream):
+class GraphqlRequest(HttpStream):
     url_base = ""
     cursor_field = ""
     primary_key = ""
@@ -217,7 +217,7 @@ class HttpRequest(HttpStream):
 
                 if endCursor == '': break
                           
-class  SourceHttpRequest(AbstractSource):
+class  SourceGraphqlRequest(AbstractSource):
     def check_connection(self, logger, config) -> Tuple[bool, any]:
         try:
             resp = self._make_request(config, logger)
@@ -274,7 +274,7 @@ class  SourceHttpRequest(AbstractSource):
             except requests.exceptions.SSLError:
                 _host = self._get_host(url)
                 self._set_certify_ssl(_host)
-                r = requests.post(url, headers=headers, json=body)
+                r = requests.get(url, headers=headers, json=body)
         elif http_method == "post":
             try:
                 r = requests.post(url, headers=headers, json=body)
@@ -326,4 +326,4 @@ class  SourceHttpRequest(AbstractSource):
 
     def streams(self, config: Mapping[str, Any]) -> List[Stream]:
         parsed_config = self._parse_config(config)
-        return [HttpRequest(parsed_config["url"], parsed_config["http_method"], parsed_config.get("headers"), parsed_config.get("body"), parsed_config.get("json_source"), parsed_config.get("json_field"),)]
+        return [GraphqlRequest(parsed_config["url"], parsed_config["http_method"], parsed_config.get("headers"), parsed_config.get("body"), parsed_config.get("json_source"), parsed_config.get("json_field"),)]

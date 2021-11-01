@@ -2,7 +2,7 @@
   "streams": [
     {
       "stream": {
-        "name": "http_request",
+        "name": "graphql_request",
         "json_schema": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "type": "object",

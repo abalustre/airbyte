@@ -23,6 +23,6 @@
 #
 
 
-from .source import SourceHttpRequest
+from .source import SourceGraphqlRequest
 
-__all__ = ["SourceHttpRequest"]
+__all__ = ["SourceGraphqlRequest"]

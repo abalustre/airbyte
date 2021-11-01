@@ -26,8 +26,8 @@
 import sys
 
 from airbyte_cdk.entrypoint import launch
-from source_graphql import SourceHttpRequest
+from source_graphql import SourceGraphqlRequest
 
 if __name__ == "__main__":
-    source = SourceHttpRequest()
+    source = SourceGraphqlRequest()
     launch(source, sys.argv[1:])
