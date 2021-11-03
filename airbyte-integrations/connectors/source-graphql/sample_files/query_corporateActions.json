@@ -3,7 +3,9 @@
     "http_method": "POST",
     "api_key": "tPS4XotJcf4DcW74vU6Z6ajtqcLwJs0z9A8gia52",
     "api_key_name": "x-api-key",
-    "params": "[{\"input_query\": \"query ($ticker: String!, $startDate: DateTime!, $endDate: DateTime!) { corporateActions( ticker: $ticker startDate: $startDate endDate: $endDate ) { ticker totalCount nodes { code description value subscriptionPrice approvalDate paymentDate initialDate isin targetIsin targetTicker } } }\", \"variables\": {\"ticker\": \"PETR4\", \"startDate\": \"2021-02-25\", \"endDate\": \"2021-07-29\"}}]",
+    "query": "query ($ticker: String!, $startDate: DateTime!, $endDate: DateTime!) { corporateActions( ticker: $ticker startDate: $startDate endDate: $endDate ) { ticker totalCount nodes { code description value subscriptionPrice approvalDate paymentDate initialDate isin targetIsin targetTicker } } }",
+    "variables": "{\"ticker\": \"PETR4\"}",
+    "params": "[{\"type\": \"period\", \"unit\": \"month\", \"format\": \"%Y-%m-%d\", \"start_date\": {\"variable\": \"startDate\", \"value\": \"current - 9\"}, \"end_date\": {\"variable\": \"endDate\", \"value\": \"current\"}}]",
     "json_source": "field",
     "json_field": "root.corporateActions.nodes"
 }

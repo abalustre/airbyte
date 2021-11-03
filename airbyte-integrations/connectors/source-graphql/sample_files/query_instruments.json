@@ -3,7 +3,8 @@
     "http_method": "POST",
     "api_key": "tPS4XotJcf4DcW74vU6Z6ajtqcLwJs0z9A8gia52",
     "api_key_name": "x-api-key",
-    "params": "[{\"input_query\": \"query ($first: Int, $after: String, $marketCode: MarketCode, $ticker: String) { instruments( first: $first after: $after marketCode: $marketCode ticker: $ticker) { pageInfo { hasNextPage hasPreviousPage startCursor endCursor } totalCount nodes { cursor clearingID description referenceDate ticker isin startTradeDate endTradeDate settlementDays marketCode marketDescription maturityDate strikePrice underlyingInstrument } } }\", \"variables\": {\"marketCode\": \"FRA\", \"ticker\": \"\", \"after\": \"\", \"first\": 100}}]",
+    "query": "query ($first: Int, $after: String, $marketCode: MarketCode, $ticker: String) { instruments( first: $first after: $after marketCode: $marketCode ticker: $ticker) { pageInfo { hasNextPage hasPreviousPage startCursor endCursor } totalCount nodes { cursor clearingID description referenceDate ticker isin startTradeDate endTradeDate settlementDays marketCode marketDescription maturityDate strikePrice underlyingInstrument } } }",
+    "variables": "{\"marketCode\": \"FRA\", \"ticker\": \"\", \"after\": \"\", \"first\": 100}",
     "json_source": "field",
     "json_field": "root.instruments.nodes"
 }

@@ -4,7 +4,7 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "GraphQL Api Spec",
     "type": "object",
-    "required": ["url", "http_method"],
+    "required": ["url", "http_method", "query"],
     "additionalProperties": false,
     "properties": {
       "url": {
@@ -26,16 +26,20 @@
         "description": "API Key name",
         "type": "string"
       },
+      "query":{
+        "description": "GraphQL input query",
+        "type": "string"
+      },
+      "variables":{
+        "description": "Input query variables",
+        "type": "string"
+      },
       "headers": {
         "description": "json object where keys are header names and values the values.",
         "type": "string",
         "examples": [
           "{ \"Accept-Charset\": \"utf-8\", \"Content-Type\": \"application/json\"}"
         ]
-      },
-      "body": {
-        "description": "json body to be included in the request",
-        "type": "string"
       },
       "params": {
         "description": "json params to be replaced in the url",

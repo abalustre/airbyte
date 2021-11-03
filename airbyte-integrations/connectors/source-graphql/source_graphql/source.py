@@ -42,6 +42,7 @@ from airbyte_cdk.models import AirbyteCatalog, AirbyteMessage, ConfiguredAirbyte
 from datetime import datetime, timedelta
 from io import StringIO
 from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
 
 
 class GraphqlRequest(HttpStream):
@@ -93,7 +94,7 @@ class GraphqlRequest(HttpStream):
         url = self.url_base
         headers = self._headers
         body = self._body
-
+        
         if http_method == "get":
             r = requests.get(url, headers=headers, json=body)
         elif http_method == "post":
@@ -188,34 +189,37 @@ class GraphqlRequest(HttpStream):
 
     def parse_response(self, response: requests.Response, **kwargs) -> Iterable[Mapping]:
         root = json.loads(response.content)
-        if self._json_source == "root":
-            endCursor = self._has_next_page(root)
-            
-            yield from root
-
-            while True:
-                root, endCursor = self._get_next_page(endCursor)
+        if 'errors' not in root.keys():
+            if self._json_source == "root":
+                endCursor = self._has_next_page(root)
+                
                 yield from root
 
-                if endCursor == '': break
+                while True:
+                    root, endCursor = self._get_next_page(endCursor)
+                    yield from root
 
+                    if endCursor == '': break
+
+            else:
+                field_list = self._json_field.split('.')             
+                for field in field_list:
+                    if field == "root":
+                        for key in root.keys(): field = key   
+                        root = root.get(field)
+                    else:
+                        endCursor = self._has_next_page(root)
+                        root = root.get(field)
+                
+                yield from root
+
+                while True:
+                    root, endCursor = self._get_next_page(endCursor)
+                    yield from root
+
+                    if endCursor == '': break
         else:
-            field_list = self._json_field.split('.')               
-            for field in field_list:
-                if field == "root":
-                    for key in root.keys(): field = key   
-                    root = root.get(field)
-                else:
-                    endCursor = self._has_next_page(root)
-                    root = root.get(field)
-            
-            yield from root
-
-            while True:
-                root, endCursor = self._get_next_page(endCursor)
-                yield from root
-
-                if endCursor == '': break
+            raise Exception(f"{root}")
                           
 class  SourceGraphqlRequest(AbstractSource):
     def check_connection(self, logger, config) -> Tuple[bool, any]:
@@ -260,6 +264,40 @@ class  SourceGraphqlRequest(AbstractSource):
             os.system(cmd)
         except Exception as e:
             raise e
+    
+    def _is_valid_date(self, value):
+        if value == "current":
+            return True
+        elif len(value.split(" ")) == 3:
+            _value = value.replace("current ", "")
+            if "-" in _value and _value.replace("- ", "").isdigit():
+                return True
+            elif "+" in _value and _value.replace("+ ", "").isdigit():
+                return True
+        return False
+
+    def _get_value(self, value, unit):
+        if self._is_valid_date(value):
+            if value == "current":
+                return datetime.today()
+            elif "-" in value:
+                digit = int(value.replace("current - ", ""))
+                if unit == "day":
+                    return datetime.today() - timedelta(days = digit)
+                if unit == "month":
+                    return datetime.today() - relativedelta(months = digit)
+                if unit == "year":
+                    return datetime.today() - relativedelta(years = digit)
+            elif "+" in value:
+                digit = int(value.replace("current + ", ""))
+                if unit == "day":
+                    return datetime.today() + timedelta(days = digit)
+                if unit == "month":
+                    return datetime.today() + relativedelta(months = digit)
+                if unit == "year":
+                    return datetime.today() + relativedelta(years = digit)
+
+        raise Exception("Params malformed")
 
     def _make_request(self, config, logger):
         parsed_config = self._parse_config(config)
@@ -288,28 +326,56 @@ class  SourceGraphqlRequest(AbstractSource):
         return r
 
     def _parse_config(self, config):
+        query = config.get('query', "")
         api_key = config.get('api_key', "")
         api_key_name = config.get('api_key_name', "")
-        params = json.loads(config.get("params", "[]"))
+        params = json.loads(config.get('params', "[]"))
+        headers = json.loads(config.get('headers', "{}"))
+        variables = json.loads(config.get('variables', "{}"))
         
         try:
             for param in params:
-                if "input_query" in param.keys():
-                    query = param["input_query"]
-                    
-                    if "variables" in param.keys():
-                        variables = param["variables"]
+                if param['type'] == 'date':
+                    if param['variable'] in query:
+                        value = self._get_value(param['value'], param['unit']).strftime(param['format'])
+                        variables[param['variable']] = value
                     else:
-                        variables = {}
-                        
-                    body = {'query': query, 'variables': variables}
+                        raise Exception("Params not informed in the input query")
+
+                elif param['type'] == 'period':
+                    if param['start_date']:
+                        if param['start_date']['variable'] in query:
+                            value = self._get_value(param['start_date']['value'], param['unit']).strftime(param['format'])
+                            variables[param['start_date']['variable']] = value
+
+                            if param['end_date']:
+                                if param['end_date']['variable'] in query:
+                                    value = self._get_value(param['end_date']['value'], param['unit']).strftime(param['format'])
+                                    variables[param['end_date']['variable']] = value
+                                else:
+                                    raise Exception("Params not informed in the input query")
+                            else:
+                                raise Exception("Params end_date not informed")
+                        else:
+                            raise Exception("Params not informed in the input query")
+                    else:
+                        raise Exception("Params start_date not informed")
                 else:
-                    raise Exception("Input query not informed in the URL")
+                    raise Exception("Params invalid")
             
-            if len(api_key):
-                headers = {api_key_name: api_key}
+            if len(query):
+                body = {'query': query, 'variables': variables}
             else:
-                headers = {}
+                raise Exception("Input query not informed in the URL")
+            
+            if len(headers):
+                if len(api_key) and len(api_key_name):
+                    headers[api_key_name] = api_key
+            else:
+                if len(api_key) and len(api_key_name):
+                    headers = {api_key_name: api_key}
+                else:
+                    headers = {}
 
         except Exception as e:
             raise e

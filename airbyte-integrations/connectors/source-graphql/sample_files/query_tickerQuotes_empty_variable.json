@@ -4,8 +4,6 @@
     "api_key": "tPS4XotJcf4DcW74vU6Z6ajtqcLwJs0z9A8gia52",
     "api_key_name": "x-api-key",
     "query": "query ($ticker: String!, $startDate: DateTime!, $endDate: DateTime) { tickerQuotes( ticker: $ticker startDate: $startDate endDate: $endDate) { totalCount nodes { tradeDate open close high low averagePrice numberOfTrades totalQuantity financialVolume bestBid bestAsk adjOpen adjClose adjHigh adjLow adjAveragePrice } } }",
-    "variables": "{\"ticker\": \"PETR4\"}",
-    "params": "[{\"type\": \"period\", \"unit\": \"day\", \"format\": \"%Y-%m-%d\", \"start_date\": {\"variable\": \"startDate\", \"value\": \"current - 2\"}, \"end_date\": {\"variable\": \"endDate\", \"value\": \"current\"}}]",
     "json_source": "field",
     "json_field": "root.tickerQuotes.nodes"
 }

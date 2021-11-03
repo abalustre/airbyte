@@ -3,7 +3,8 @@
     "http_method": "POST",
     "api_key": "tPS4XotJcf4DcW74vU6Z6ajtqcLwJs0z9A8gia52",
     "api_key_name": "x-api-key",
-    "params": "[{\"input_query\": \"query ($ticker: String!, $period: Period!) { tickerQuotesTS( ticker: $ticker period: $period ) { totalCount nodes { startTime endTime open close high low adjOpen adjClose adjHigh adjLow averagePrice adjAveragePrice numberOfTrades totalQuantity financialVolume } } }\", \"variables\": {\"ticker\": \"PETR4\", \"period\": \"LAST_YEAR\"}}]",
+    "query": "query ($ticker: String!, $period: Period!) { tickerQuotesTS( ticker: $ticker period: $period ) { totalCount nodes { startTime endTime open close high low adjOpen adjClose adjHigh adjLow averagePrice adjAveragePrice numberOfTrades totalQuantity financialVolume } } }",
+    "variables": "{\"ticker\": \"PETR4\", \"period\": \"LAST_YEAR\"}",
     "json_source": "field",
     "json_field": "root.tickerQuotesTS.nodes"
 }
