@@ -210,17 +210,17 @@ class SourceHttpRequest(AbstractSource):
                 if unit == "day":
                     return datetime.today() - timedelta(days = digit)
                 if unit == "month":
-                    return datetime.today() - relativedelta(month = digit)
+                    return datetime.today() - relativedelta(months = digit)
                 if unit == "year":
-                    return datetime.today() - relativedelta(year = digit)
+                    return datetime.today() - relativedelta(years = digit)
             elif "+" in value:
                 digit = int(value.replace("current + ", ""))
                 if unit == "day":
                     return datetime.today() + timedelta(days = digit)
                 if unit == "month":
-                    return datetime.today() + timedelta(month = digit)
+                    return datetime.today() + relativedelta(months = digit)
                 if unit == "year":
-                    return datetime.today() + timedelta(year = digit)
+                    return datetime.today() + relativedelta(years = digit)
 
         raise Exception("Params malformed")
 
