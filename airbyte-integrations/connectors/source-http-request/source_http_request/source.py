@@ -37,6 +37,7 @@ from airbyte_cdk.sources.streams.http import HttpStream
 from airbyte_cdk.logger import AirbyteLogger
 from airbyte_cdk.models import AirbyteCatalog, AirbyteMessage, ConfiguredAirbyteCatalog, SyncMode, AirbyteMessage, AirbyteRecordMessage, Type
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from io import StringIO
 from dateutil.parser import parse
 
@@ -209,9 +210,9 @@ class SourceHttpRequest(AbstractSource):
                 if unit == "day":
                     return datetime.today() - timedelta(days = digit)
                 if unit == "month":
-                    return datetime.today() - timedelta(month = digit)
+                    return datetime.today() - relativedelta(month = digit)
                 if unit == "year":
-                    return datetime.today() - timedelta(year = digit)
+                    return datetime.today() - relativedelta(year = digit)
             elif "+" in value:
                 digit = int(value.replace("current + ", ""))
                 if unit == "day":
