@@ -104,7 +104,7 @@ class HttpRequest(HttpStream):
 
     def get_json_schema(self):
         schema = super().get_json_schema()
-
+        headers = ''
         resp = self._make_request()
         if resp.status_code == 200:
             if self._response_format == "csv":
