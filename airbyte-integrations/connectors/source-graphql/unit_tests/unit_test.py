@@ -25,7 +25,7 @@
 
 import unittest
 
-from source_graphql import SourceHttpRequest
+from source_graphql import SourceGraphqlRequest
 from unittest.mock import patch, Mock
 from datetime import date
 
@@ -34,12 +34,12 @@ class TestSourceHttpRequest(unittest.TestCase):
         config = {
             "url": "https://swapi-graphql.netlify.app/.netlify/functions/index",
             "http_method": "POST",
-            "params": "[{\"input_query\": \"query Root($after: String, $first: Int) { allFilms(after: $after, first: $first) { pageInfo { hasNextPage hasPreviousPage startCursor endCursor } totalCount films { title episodeID openingCrawl director producers releaseDate } } }\", \"variables\": {}}]",
+            "query": "query Root($after: String, $first: Int) { allFilms(after: $after, first: $first) { pageInfo { hasNextPage hasPreviousPage startCursor endCursor } totalCount films { title episodeID openingCrawl director producers releaseDate } } }",
             "json_source": "field",
             "json_field": "root.allFilms.films"
         }
 
-        source = SourceHttpRequest()
+        source = SourceGraphqlRequest()
         actual = source._parse_config(config)
         expected = {
             "url": "https://swapi-graphql.netlify.app/.netlify/functions/index",
@@ -57,12 +57,12 @@ class TestSourceHttpRequest(unittest.TestCase):
             "http_method": "POST",
             "api_key": "tPS4XotJcf4DcW74vU6Z6ajtqcLwJs0z9A8gia52",
             "api_key_name": "x-api-key",
-            "params": "[{\"input_query\": \"query { corporateActionCodes { totalCount nodes { code description } } }\"}]",
+            "query": "query { corporateActionCodes { totalCount nodes { code description } } }",
             "json_source": "field",
             "json_field": "root.corporateActionCodes.nodes"
         }
 
-        source = SourceHttpRequest()
+        source = SourceGraphqlRequest()
         actual = source._parse_config(config)
         expected = {
             "url": "https://md.uat.idealtech.services/",
@@ -77,7 +77,7 @@ class TestSourceHttpRequest(unittest.TestCase):
     def test_get_host_success(self):
         url = "https://swapi-graphql.netlify.app/.netlify/functions/index"
 
-        source = SourceHttpRequest()
+        source = SourceGraphqlRequest()
         actual = source._get_host(url)
         expected = "swapi-graphql.netlify.app"
         self.assertEqual(expected, actual)
