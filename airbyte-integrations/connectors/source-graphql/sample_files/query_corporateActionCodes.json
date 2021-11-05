@@ -1,0 +1,9 @@
+{
+    "url": "https://md.uat.idealtech.services/",
+    "http_method": "POST",
+    "api_key": "tPS4XotJcf4DcW74vU6Z6ajtqcLwJs0z9A8gia52",
+    "api_key_name": "x-api-key",
+    "query": "query { corporateActionCodes { totalCount nodes { code description } } }",
+    "json_source": "field",
+    "json_field": "root.corporateActionCodes.nodes"
+}
