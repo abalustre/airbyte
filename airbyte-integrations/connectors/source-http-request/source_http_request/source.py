@@ -26,6 +26,7 @@
 from typing import Any, Iterable, List, Mapping, MutableMapping, Optional, Tuple
 
 import requests
+import urllib3
 import json
 import csv
 import pandas as pd
@@ -37,8 +38,17 @@ from airbyte_cdk.sources.streams.http import HttpStream
 from airbyte_cdk.logger import AirbyteLogger
 from airbyte_cdk.models import AirbyteCatalog, AirbyteMessage, ConfiguredAirbyteCatalog, SyncMode, AirbyteMessage, AirbyteRecordMessage, Type
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from io import StringIO
 from dateutil.parser import parse
+
+requests.packages.urllib3.disable_warnings()
+requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
+try:
+    requests.packages.urllib3.contrib.pyopenssl.util.ssl_.DEFAULT_CIPHERS += ':HIGH:!DH:!aNULL'
+except AttributeError:
+    # no pyopenssl support used / needed / available
+    pass
 
 
 class HttpRequest(HttpStream):
@@ -46,7 +56,7 @@ class HttpRequest(HttpStream):
     cursor_field = ""
     primary_key = ""
 
-    def __init__(self, url: str, http_method: str, headers: Optional[str], body: Optional[str], response_format: Optional[str], response_delimiter: Optional[str], json_source: Optional[str], json_field: Optional[str]):
+    def __init__(self, url: str, http_method: str, headers: Optional[str], body: Optional[str], response_format: Optional[str], response_delimiter: Optional[str], json_source: Optional[str], json_field: Optional[str], json_type: Optional[str]):
         super().__init__()
         self.url_base = url
         self._http_method = http_method
@@ -56,6 +66,7 @@ class HttpRequest(HttpStream):
         self._response_delimiter = response_delimiter
         self._json_source = json_source
         self._json_field = json_field
+        self._json_type = json_type
 
     @property
     def http_method(self) -> str:
@@ -104,7 +115,7 @@ class HttpRequest(HttpStream):
 
     def get_json_schema(self):
         schema = super().get_json_schema()
-
+        headers = ''
         resp = self._make_request()
         if resp.status_code == 200:
             if self._response_format == "csv":
@@ -116,7 +127,12 @@ class HttpRequest(HttpStream):
                 if self._json_source == "root":
                     df = pd.DataFrame.from_dict(root)
                 else:
-                    df = pd.DataFrame.from_dict(root[self._json_field])
+                    if self._json_type == "object":
+                        df = pd.DataFrame.from_dict(root[self._json_field])
+                    else:
+                        root = root[self._json_field]
+                        my_dict = [root[i][0] for i in sorted(root.keys())][0]
+                        df = pd.DataFrame.from_dict([my_dict])
                 headers = df.columns.tolist()
 
         properties = {}
@@ -147,12 +163,17 @@ class HttpRequest(HttpStream):
             data = csv.DictReader(decoded.splitlines(), delimiter=self._response_delimiter)
             yield from data
         elif self._response_format == "json":
-            print("BEFORE")
             root = json.loads(response.content)
             if self._json_source == "root":
                 yield from root
             else:
-                yield from root[self._json_field]
+                if self._json_type == "object":
+                    yield from root[self._json_field]
+                else:
+                    my_dict = root[self._json_field]
+                    for _, values in root[self._json_field].items():
+                        for value in values:
+                            yield value
         else:
             raise Exception("Invalid response format")
 
@@ -209,17 +230,17 @@ class SourceHttpRequest(AbstractSource):
                 if unit == "day":
                     return datetime.today() - timedelta(days = digit)
                 if unit == "month":
-                    return datetime.today() - timedelta(month = digit)
+                    return datetime.today() - relativedelta(months = digit)
                 if unit == "year":
-                    return datetime.today() - timedelta(year = digit)
+                    return datetime.today() - relativedelta(years = digit)
             elif "+" in value:
                 digit = int(value.replace("current + ", ""))
                 if unit == "day":
                     return datetime.today() + timedelta(days = digit)
                 if unit == "month":
-                    return datetime.today() + timedelta(month = digit)
+                    return datetime.today() + relativedelta(months = digit)
                 if unit == "year":
-                    return datetime.today() + timedelta(year = digit)
+                    return datetime.today() + relativedelta(years = digit)
 
         raise Exception("Params malformed")
 
@@ -271,10 +292,11 @@ class SourceHttpRequest(AbstractSource):
             "response_delimiter": config.get("response_delimiter", ","),
             "json_source": config.get("json_source", "root"),
             "json_field": config.get("json_field", ""),
+            "json_type": config.get("json_type", "object"),
         }
 
 
     def streams(self, config: Mapping[str, Any]) -> List[Stream]:
         parsed_config = self._parse_config(config)
         return [HttpRequest(parsed_config["url"], parsed_config["http_method"], parsed_config.get("headers"), parsed_config.get("body"), parsed_config.get("response_format"),
-                            parsed_config.get("response_delimiter"), parsed_config.get("json_source"), parsed_config.get("json_field"),)]
+                            parsed_config.get("response_delimiter"), parsed_config.get("json_source"), parsed_config.get("json_field"), parsed_config.get("json_type"),)]

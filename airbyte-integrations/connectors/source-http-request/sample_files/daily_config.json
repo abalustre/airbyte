@@ -1,0 +1,1 @@
+{"url": "https://www.b3.com.br/json/{date}/Posicoes/Empresa/SI_C_OPCPOSABEMP.json", "http_method": "GET", "response_format": "json", "params": "[{\"type\": \"date\", \"unit\": \"day\", \"format\": \"%Y%m%d\", \"variable\": \"date\", \"value\": \"current\"}]", "headers": "{\"Content-Type\": \"text/json\"}", "json_source": "root"}
