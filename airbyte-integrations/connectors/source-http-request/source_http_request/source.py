@@ -38,6 +38,7 @@ from airbyte_cdk.sources.streams.http import HttpStream
 from airbyte_cdk.logger import AirbyteLogger
 from airbyte_cdk.models import AirbyteCatalog, AirbyteMessage, ConfiguredAirbyteCatalog, SyncMode, AirbyteMessage, AirbyteRecordMessage, Type
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from io import StringIO
 from dateutil.parser import parse
 
@@ -114,7 +115,7 @@ class HttpRequest(HttpStream):
 
     def get_json_schema(self):
         schema = super().get_json_schema()
-
+        headers = ''
         resp = self._make_request()
         if resp.status_code == 200:
             if self._response_format == "csv":
@@ -229,17 +230,17 @@ class SourceHttpRequest(AbstractSource):
                 if unit == "day":
                     return datetime.today() - timedelta(days = digit)
                 if unit == "month":
-                    return datetime.today() - timedelta(month = digit)
+                    return datetime.today() - relativedelta(months = digit)
                 if unit == "year":
-                    return datetime.today() - timedelta(year = digit)
+                    return datetime.today() - relativedelta(years = digit)
             elif "+" in value:
                 digit = int(value.replace("current + ", ""))
                 if unit == "day":
                     return datetime.today() + timedelta(days = digit)
                 if unit == "month":
-                    return datetime.today() + timedelta(month = digit)
+                    return datetime.today() + relativedelta(months = digit)
                 if unit == "year":
-                    return datetime.today() + timedelta(year = digit)
+                    return datetime.today() + relativedelta(years = digit)
 
         raise Exception("Params malformed")
 
