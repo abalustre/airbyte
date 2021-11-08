@@ -19,6 +19,9 @@ This document list all Abalustre Airbyte's connectors and how to install them.
 
 ## Abalustre connectors
 
+<details>
+<summary> HTTP Request </summary>
+
 ### HTTP Request
 
 This connector makes HTTP requests allowing the user to configure dates and dates period as variables.
@@ -130,6 +133,11 @@ The HTTP Request connector has the following fields:
 
 <br></br>
 ****
+</details>
+
+<details>
+<summary>GraphQL Request</summary>
+
 ### GraphQL Request
 
 This connector makes GraphQL requests allowing the user to configure queries and input filters as variables.
@@ -252,3 +260,4 @@ The GraphQL Request connector has the following fields:
 &nbsp;&nbsp;&nbsp;&nbsp;**json_source**: field
 
 &nbsp;&nbsp;&nbsp;&nbsp;**json_field**: root.allFilms.films
+</details>
