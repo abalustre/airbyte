@@ -135,9 +135,7 @@ class HttpRequest(HttpStream):
                         df = pd.DataFrame.from_dict([my_dict])
                 headers = df.columns.tolist()
             elif self._response_format == "xlsx":
-                data_xls = pd.read_excel(resp.content,  dtype=str, index_col=None)
-                data_xls.to_csv('temp.csv', encoding='utf-8', index=False)
-                df = pd.read_csv('./temp.csv', dtype=str, index_col=None)
+                df = pd.read_excel(resp.content,  dtype=str, index_col=None)
                 headers = df.columns.tolist()
 
         properties = {}
