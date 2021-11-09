@@ -35,7 +35,7 @@
       "response_format": {
         "description": "the format of the response",
         "type": "string",
-        "enum": ["csv", "json"]
+        "enum": ["csv", "json", "xlsx"]
       },
       "response_delimiter": {
         "description": "the response delimiter when the response format is csv",

@@ -134,6 +134,9 @@ class HttpRequest(HttpStream):
                         my_dict = [root[i][0] for i in sorted(root.keys())][0]
                         df = pd.DataFrame.from_dict([my_dict])
                 headers = df.columns.tolist()
+            elif self._response_format == "xlsx":
+                df = pd.read_excel(resp.content,  dtype=str, index_col=None)
+                headers = df.columns.tolist()
 
         properties = {}
         for header in headers:
@@ -174,6 +177,10 @@ class HttpRequest(HttpStream):
                     for _, values in root[self._json_field].items():
                         for value in values:
                             yield value
+        elif self._response_format == "xlsx":
+            pd.read_excel(response.content,  dtype=str, index_col=None).to_csv('temp.csv', encoding='utf-8', index=False)
+            data = csv.DictReader(pd.read_csv('./temp.csv', dtype=str, delimiter=self._response_delimiter).to_string(index=False).splitlines(), dialect='excel')
+            yield from data
         else:
             raise Exception("Invalid response format")
 
