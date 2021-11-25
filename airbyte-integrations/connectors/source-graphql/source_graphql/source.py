@@ -183,6 +183,8 @@ class GraphqlRequest(HttpStream):
                         else:
                             endCursor = self._has_next_page(root)
                             root = root.get(field)
+                    
+                    root = list(filter(None.__ne__, root))#filter to remove none elements from the list
 
         return root, endCursor
 
