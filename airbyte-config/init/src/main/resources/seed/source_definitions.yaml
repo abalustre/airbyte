@@ -30,6 +30,13 @@
   documentationUrl: https://docs.airbyte.io/integrations/sources/file
   icon: file.svg
   sourceType: file
+- sourceDefinitionId: 778daa7c-feaf-4db6-96f3-70fd645acc78
+  name: File Tc
+  dockerRepository: airbyte/source-file-tc
+  dockerImageTag: 0.1.0
+  documentationUrl: https://docs.airbyte.io/integrations/sources/file-tc
+  icon: file.svg
+  sourceType: file
 - sourceDefinitionId: 253487c0-2246-43ba-a21f-5116b20a2c50
   name: Google Ads
   dockerRepository: airbyte/source-google-ads
