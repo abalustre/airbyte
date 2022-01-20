@@ -234,6 +234,8 @@ class SourceHttpRequest(AbstractSource):
                 return datetime.today()
             elif "-" in value:
                 digit = int(value.replace("current - ", ""))
+                if unit == "minutes":
+                    return datetime.today() - timedelta(minutes = digit)
                 if unit == "day":
                     return datetime.today() - timedelta(days = digit)
                 if unit == "month":
@@ -242,6 +244,8 @@ class SourceHttpRequest(AbstractSource):
                     return datetime.today() - relativedelta(years = digit)
             elif "+" in value:
                 digit = int(value.replace("current + ", ""))
+                if unit == "minutes":
+                    return datetime.today() - timedelta(minutes = digit)
                 if unit == "day":
                     return datetime.today() + timedelta(days = digit)
                 if unit == "month":
