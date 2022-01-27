@@ -1,0 +1,56 @@
+{
+    "documentationUrl": "https://docs.airbyte.io/integrations/sources/file",
+    "connectionSpecification": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "File Source Spec",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "dataset_name",
+            "format",
+            "url",
+            "provider"
+        ],
+        "properties": {
+            "dataset_name": {
+                "type": "string",
+                "description": "Name of the final table where to replicate this file (should include only letters, numbers dash and underscores)"
+            },
+            "format": {
+                "type": "string",
+                "enum": [
+                    "json",
+                    "jsonl"
+                ],
+                "description": "File Format of the file to be replicated (Warning: some format may be experimental, please refer to docs)."
+            },
+            "url": {
+                "type": "string",
+                "description": "URL path to access the file to be replicated"
+            },
+            "params": {
+                "type": "array",
+                "description": "list with json params to be replaced in the url. See more https://github.com/tradersclub/airbyte/blob/master/ABALUSTRE_CONNECTORS.md",
+                "default": []
+            },
+            "provider": {
+                "type": "object",
+                "description": "Storage Provider or Location of the file(s) to be replicated.",
+                "default": "Public Web",
+                "properties": {
+                    "storage": {
+                        "type": "string",
+                        "enum": [
+                            "GCS"
+                        ],
+                        "default": "GCS"
+                    },
+                    "service_account_json": {
+                        "type": "string",
+                        "description": "In order to access private Buckets stored on Google Cloud, this connector would need a service account json credentials with the proper permissions as described <a href=\"https://cloud.google.com/iam/docs/service-accounts\" target=\"_blank\">here</a>. Please generate the credentials.json file and copy/paste its content to this field (expecting JSON formats). If accessing publicly available data, this field is not necessary."
+                    }
+                }
+            }
+        }
+    }
+}
