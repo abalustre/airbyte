@@ -163,10 +163,10 @@ class HttpRequest(HttpStream):
         elif self._response_format == "json":
             root = json.loads(response.content)
 
-            if self._json_source == "root":
-                yield from root if isinstance(root, list) else [root]
-            else:
-                yield from root[self._json_field] if self._json_type == "object" else [root[self._json_field]]
+            if self._json_source == "field":
+                root = root[self._json_field]
+            
+            yield from root if isinstance(root, list) else [root]
 
         elif self._response_format == "xlsx":
             pd.read_excel(response.content,  dtype=str, index_col=None).to_csv('temp.csv', encoding='utf-8', index=False)
