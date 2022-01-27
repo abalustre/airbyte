@@ -127,12 +127,7 @@ class HttpRequest(HttpStream):
                 if self._json_source == "root":
                     df = pd.DataFrame.from_dict(root)
                 else:
-                    if self._json_type == "object":
-                        df = pd.DataFrame.from_dict(root[self._json_field])
-                    else:
-                        root = root[self._json_field]
-                        my_dict = [root[i][0] for i in sorted(root.keys())][0]
-                        df = pd.DataFrame.from_dict([my_dict])
+                    df = pd.DataFrame.from_dict(root[self._json_field])
                 headers = df.columns.tolist()
             elif self._response_format == "xlsx":
                 df = pd.read_excel(resp.content,  dtype=str, index_col=None)
@@ -167,16 +162,12 @@ class HttpRequest(HttpStream):
             yield from data
         elif self._response_format == "json":
             root = json.loads(response.content)
-            if self._json_source == "root":
-                yield from root
-            else:
-                if self._json_type == "object":
-                    yield from root[self._json_field]
-                else:
-                    my_dict = root[self._json_field]
-                    for _, values in root[self._json_field].items():
-                        for value in values:
-                            yield value
+
+            if self._json_source == "field":
+                root = root[self._json_field]
+            
+            yield from root if isinstance(root, list) else [root]
+
         elif self._response_format == "xlsx":
             pd.read_excel(response.content,  dtype=str, index_col=None).to_csv('temp.csv', encoding='utf-8', index=False)
             data = csv.DictReader(pd.read_csv('./temp.csv', dtype=str, delimiter=self._response_delimiter).to_string(index=False).splitlines(), dialect='excel')
